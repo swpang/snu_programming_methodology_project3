@@ -17,13 +17,63 @@
  */
 bool NormalController::stackFood(const string name, intPair foodSize, int exp)
 {
-    /**
-     * ===============================================
-     * ======== TODO: Implement this function ========
-     * ===============================================
-     */
+    if (shelves.size() == 0)
+        shelves.push_back(Shelf(0));
 
-    return false;
+    for (auto elem : shelves) {
+        int n = elem.vec.size();
+        if (n >= 1) { // shelf 가 비지 않은 경우
+            int emptyPos = elem.vec[n - 1]->getPos().first + elem.vec[n - 1]->getSize().first;
+            if (emptyPos + foodSize.first >= size.first) // 이 shelf에는 못들어간다!
+                continue;
+            else { // 이 shelf에 들어갈만한 빈공간이 충분하다!
+                FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), emptyPos, elem.height);
+                elem.vec.push_back(food);
+                
+                map<string, vector<FoodPtr>>::iterator it = foodList.begin();
+                while (it != foodList.end()) { // 이미 foodList에 같은 항목의 음식이 들어있다면
+                    if (it->first == name) {
+                        it->second.push_back(food);
+                        return true;
+                    }                        
+                }
+                // 같은 항목의 음식이 들어있지 않다면
+                foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
+                return true;
+            }
+        }
+        else { // shelf 가 빈 경우
+            FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), 0, elem.height);
+            elem.vec.push_back(food);
+            
+            map<string, vector<FoodPtr>>::iterator it = foodList.begin();
+            while (it != foodList.end()) { // 이미 foodList에 같은 항목의 음식이 들어있다면
+                if (it->first == name) {
+                    it->second.push_back(food);
+                    return true;
+                }                        
+            }
+            // 같은 항목의 음식이 들어있지 않다면
+            foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
+            return true;
+        } 
+    }
+
+    // 새로운 shelf를 추가해야한 경우 (모든 shelf를 다 돌았는데 배치를 못받은 경우에 대해)
+    shelves.push_back(Shelf(shelves.size() * MAX_HEIGHT));
+    FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), 0, shelves.back().height);
+    shelves.back().vec.push_back(food);
+
+    map<string, vector<FoodPtr>>::iterator it = foodList.begin();
+    while (it != foodList.end()) { // 이미 foodList에 같은 항목의 음식이 들어있다면
+        if (it->first == name) {
+            it->second.push_back(food);
+            return true;
+        }                        
+    }
+    // 같은 항목의 음식이 들어있지 않다면
+    foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
+    return true;
 }
 
 
@@ -37,10 +87,8 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
  */
 bool NormalController::popFood(const string food_name)
 {
-    /**
-     * ===============================================
-     * ======== TODO: Implement this function ========
-     * ===============================================
-     */
+    
+
+
     return false;
 }

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <string>
 
 #include "Food.h"
 #include "Recipe.h"
@@ -35,23 +36,42 @@ void SmartRefrigerator::addRecipeFromFile()
         cout << "There is no recipe file!" << endl;
         return;
     } else {
-        string mealName;
-        string foodName;
-        string foodCount;
-        int satisfaction;
-        string recipe;
-
         int line(0);
         while (recipe_list.peek() != EOF) {
-            getline(recipe_list, recipe);
-            istringstream iss (recipe);
+            Recipe* recipe;
+
+            string *mealName;
+            string foodName;
+            int foodCount;
+            double satisfaction;
+            string line;
+
+            strIntPair ingredient;
+            
+            getline(recipe_list, line);
+            istringstream iss(line);
             
             string temp;
             int idx(0);
             while (iss >> temp) {
-                if (idx == 0) mealName = temp;
-                else if (idx % )
+                if (idx == 0) *mealName = temp;
+                else if (temp != "/") {
+                    foodName = temp;
+                    iss >> temp;
+                    foodCount = stoi(temp);
+                    ingredient.first = foodName;
+                    ingredient.second = foodCount;
+                }
+                else {
+                    iss >> temp;
+                    satisfaction = stoi(temp);
+                }
+                idx++;
             }
+            
+            recipe = new Recipe(mealName, ingredient, satisfaction);
+            
+            recipes.push_back(*recipe);
         }
         
     }
