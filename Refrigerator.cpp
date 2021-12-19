@@ -179,11 +179,7 @@ void Refrigerator::insertFoodDirectly()
     cout << "Days left to expiration date : ";
     cin >> expDate;
 
-    /**
-     * ===============================================
-     * ========== TODO: Implement this part ==========
-     * ===============================================
-     */
+    controller->stackFood(foodName, foodSize, expDate);
 }
 
 /**
@@ -204,11 +200,37 @@ void Refrigerator::insertFoodFromFile()
     }
     else
     {
-        /**
-         * ===============================================
-         * ========== TODO: Implement this part ==========
-         * ===============================================
-         */
+        string foodName;
+        intPair foodSize;
+        int expDate;
+        int numFoods;
+
+        int idx(0);
+        string temp;
+        while (ff >> temp) {
+            int sw = idx % 4;
+            switch (sw) {
+            case 0:
+                foodName = temp;
+                break;
+            case 1:
+                foodSize.first = stoi(temp);
+                ff >> temp;
+                foodSize.second = stoi(temp);
+                break;
+            case 2:
+                numFoods = stoi(temp);
+                break;
+            case 3:
+                expDate = stoi(temp);
+                break;
+            }
+
+            for (int i = 0; i < numFoods; i++)
+                controller->stackFood(foodName, foodSize, expDate);
+
+            idx++;
+        }
     }
     ff.close();
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <limits>
 #include "Refrigerator.h"
 #include "SmartRefrigerator.h"
 #include "Simulator.h"
@@ -29,7 +30,6 @@ void Simulator::start()
         cout << "1. Normal refrigerator" << endl;
         cout << "2. Smart refrigerator" << endl;
         cout << "What type of refrigerator do you have? : ";
-        // ref_type = 1; //TODO: remove this line and restore the below comment before commit.
         cin >> ref_type;
         if (ref_type == 1)
         {
