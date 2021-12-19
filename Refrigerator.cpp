@@ -179,7 +179,9 @@ void Refrigerator::insertFoodDirectly()
     cout << "Days left to expiration date : ";
     cin >> expDate;
 
-    controller->stackFood(foodName, foodSize, expDate);
+    if (controller->stackFood(foodName, foodSize, expDate))
+        cout << "Inserting bacon into " << endl;
+    else cout << "the foods cannot be inserted";
 }
 
 /**
@@ -226,9 +228,11 @@ void Refrigerator::insertFoodFromFile()
                 break;
             }
 
-            for (int i = 0; i < numFoods; i++)
-                controller->stackFood(foodName, foodSize, expDate);
-
+            for (int i = 0; i < numFoods; i++) {
+                if (controller->stackFood(foodName, foodSize, expDate))
+                    cout << "Inserting bacon into " << endl;
+                else cout << "the foods cannot be inserted";
+            }
             idx++;
         }
     }
