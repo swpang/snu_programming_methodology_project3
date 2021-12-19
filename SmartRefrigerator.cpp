@@ -70,7 +70,8 @@ void SmartRefrigerator::addRecipeFromFile()
             }
             
             recipe = new Recipe(mealName, ingredient, satisfaction);
-            
+            // TO-DO : why is this not working???????
+
             recipes.push_back(*recipe);
         }
         
