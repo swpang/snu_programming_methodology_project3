@@ -35,7 +35,7 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
                         elem.vec.push_back(food);
                         it->second.push_back(food);
 
-                        cout << "x: " << elem.height << "y: " << 0 << endl;
+                        cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
                         return true;
                     }                        
                 }
@@ -53,7 +53,7 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
                     elem.vec.push_back(food);
                     it->second.push_back(food);
 
-                    cout << "x: " << elem.height << "y: " << 0 << endl;
+                    cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
                     return true;
                 }                        
             }
@@ -76,7 +76,7 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
             shelves.back().vec.push_back(food);
             it->second.push_back(food);
 
-            cout << "x: " << shelves.back().height << "y: " << 0 << endl;
+            cout << "Inserting " << name << " into x: " << shelves.back().height << "y: " << 0 << endl;
             return true;
         }                        
     }
@@ -96,7 +96,31 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
  */
 bool NormalController::popFood(const string food_name)
 {
-    
+    FoodPtr min;
+    min = *findMinExpFood(food_name);
 
+    bool popped = false;
+
+    for (auto & shelf : shelves) {
+        for (auto & elem : shelf.vec) {
+            if (elem->getName() == food_name && elem->getExp() == min->getExp()) {
+                cout << "position to pop : x: " << elem->getPos().first << ", y: " << elem->getPos().second << endl;
+                cout << "A(n) " << food_name << " with expire date " << min->getExp() << " has been popped" << endl;
+                popped = true;
+                break;
+            }
+        }
+    }
+
+    if (!popped) {
+        map<string, vector<FoodPtr>>::iterator it = foodList.begin();
+        while (it != foodList.end()) {
+        if (it->first == food_name) {
+            it->second.erase(findMinExpFood(food_name));
+            return true;
+            }
+        }
+    }
+    
     return false;
 }

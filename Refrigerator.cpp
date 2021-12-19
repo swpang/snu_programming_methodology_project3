@@ -229,9 +229,8 @@ void Refrigerator::insertFoodFromFile()
             }
 
             for (int i = 0; i < numFoods; i++) {
-                if (controller->stackFood(foodName, foodSize, expDate))
-                    cout << "Inserting bacon into " << endl;
-                else cout << "the foods cannot be inserted";
+                if (!controller->stackFood(foodName, foodSize, expDate))
+                    cout << "the foods cannot be inserted";
             }
             idx++;
         }
@@ -245,11 +244,13 @@ void Refrigerator::insertFoodFromFile()
  */
 void Refrigerator::popFood()
 {
-    /**
-     * ===============================================
-     * ======== TODO: Implement this function ========
-     * ===============================================
-     */
+    string foodName;
+
+    cout << "Which food do you want to pop? : ";
+    cin >> foodName;
+
+    if (!controller->popFood(foodName))
+        cout << "There's no food that you want!";
 }
 
 
