@@ -20,6 +20,8 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
     if (shelves.size() == 0)
         shelves.push_back(Shelf(0));
 
+    vector<FoodPtr> &v = foodList[name];
+
     for (auto elem : shelves) {
         int n = elem.vec.size();
         if (n >= 1) { // shelf 가 비지 않은 경우
@@ -29,16 +31,11 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
             else { // 이 shelf에 들어갈만한 빈공간이 충분하다!
                 FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), emptyPos, elem.height);
 
-                map<string, vector<FoodPtr>>::iterator it = foodList.begin();
-                while (it != foodList.end()) { // 이미 foodList에 같은 항목의 음식이 들어있다면
-                    if (it->first == name) {
-                        elem.vec.push_back(food);
-                        it->second.push_back(food);
-
-                        cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
-                        return true;
-                    }                        
-                }
+                elem.vec.push_back(food);
+                v.push_back(food);
+                cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
+                return true;
+                
                 // 같은 항목의 음식이 들어있지 않다면
                 foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
                 return true;
@@ -47,16 +44,11 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
         else { // shelf 가 빈 경우
             FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), 0, elem.height);
 
-            map<string, vector<FoodPtr>>::iterator it = foodList.begin();
-            while (it != foodList.end()) { 
-                if (it->first == name) { // 이미 foodList에 같은 항목의 음식이 들어있다면
-                    elem.vec.push_back(food);
-                    it->second.push_back(food);
+            elem.vec.push_back(food);
+            v.push_back(food);
+            cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
+            return true;
 
-                    cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
-                    return true;
-                }                        
-            }
             // 같은 항목의 음식이 들어있지 않다면
             foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
             return true;
@@ -70,16 +62,11 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
     shelves.push_back(Shelf(shelves.size() * MAX_HEIGHT));
     FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), 0, shelves.back().height);
 
-    map<string, vector<FoodPtr>>::iterator it = foodList.begin();
-    while (it != foodList.end()) { // 이미 foodList에 같은 항목의 음식이 들어있다면
-        if (it->first == name) {
-            shelves.back().vec.push_back(food);
-            it->second.push_back(food);
+    shelves.back().vec.push_back(food);
+    v.push_back(food);
+    cout << "Inserting " << name << " into x: " << shelves.back().height << "y: " << 0 << endl;
+    return true;
 
-            cout << "Inserting " << name << " into x: " << shelves.back().height << "y: " << 0 << endl;
-            return true;
-        }                        
-    }
     // 같은 항목의 음식이 들어있지 않다면
     foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
     return true;
@@ -113,14 +100,10 @@ bool NormalController::popFood(const string food_name)
     }
 
     if (!popped) {
-        map<string, vector<FoodPtr>>::iterator it = foodList.begin();
-        while (it != foodList.end()) {
-        if (it->first == food_name) {
-            it->second.erase(findMinExpFood(food_name));
-            return true;
-            }
-        }
+        vector<FoodPtr> &v = foodList[food_name];
+        v.erase(findMinExpFood(food_name));
+        return true;
     }
-    
+
     return false;
 }
