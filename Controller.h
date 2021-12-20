@@ -30,6 +30,7 @@ protected:
     foodListType &foodList;
 
     vector<FoodPtr>::iterator findMinExpFood(const string);
+    static bool comparePos(const FoodPtr food1, const FoodPtr food2);
     
 private:
     bool **storageGrid;

@@ -36,6 +36,18 @@ vector<FoodPtr>::iterator Controller::findMinExpFood(const string food_name)
     return min_element(v.begin(), v.end(), comp);
 }
 
+bool Controller::comparePos(const FoodPtr food1, const FoodPtr food2)
+{
+    if (food1->getPos().second < food2->getPos().second)
+        return true;
+    else if (food1->getPos().second == food2->getPos().second) {
+        if (food1->getPos().first < food2->getPos().first)
+            return true;
+        else return false;
+    }
+    else return false;
+}
+
 /**
  * Set element of storageGrid in the given range to true
  *
