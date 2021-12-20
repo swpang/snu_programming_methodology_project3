@@ -224,12 +224,11 @@ void Refrigerator::insertFoodFromFile()
                 break;
             case 3:
                 expDate = stoi(temp);
-                break;
-            }
 
-            for (int i = 0; i < numFoods; i++) {
-                if (!controller->stackFood(foodName, foodSize, expDate))
-                    cout << "the foods cannot be inserted";
+                for (int i = 0; i < numFoods; i++)
+                    if (!controller->stackFood(foodName, foodSize, expDate))
+                        cout << "the foods cannot be inserted";
+                break;
             }
             idx++;
         }

@@ -57,7 +57,7 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
         return false;
     
     shelves.push_back(Shelf(shelves.size() * MAX_HEIGHT));
-    FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), 0, shelves.back().height);
+    food = new FoodInFridge(Food(name, foodSize, exp), 0, shelves.back().height);
 
     shelves.back().vec.push_back(food);
     v.push_back(food);
