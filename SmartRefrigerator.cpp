@@ -40,13 +40,14 @@ void SmartRefrigerator::addRecipeFromFile()
         while (recipe_list.peek() != EOF) {
             Recipe* recipe;
 
-            string *mealName;
+            string mealName;
             string foodName;
             int foodCount;
             double satisfaction;
             string line;
 
             strIntPair ingredient;
+            vector<strIntPair> ingredient_vec;
             
             getline(recipe_list, line);
             istringstream iss(line);
@@ -54,13 +55,14 @@ void SmartRefrigerator::addRecipeFromFile()
             string temp;
             int idx(0);
             while (iss >> temp) {
-                if (idx == 0) *mealName = temp;
+                if (idx == 0) mealName = temp;
                 else if (temp != "/") {
                     foodName = temp;
                     iss >> temp;
                     foodCount = stoi(temp);
                     ingredient.first = foodName;
                     ingredient.second = foodCount;
+                    ingredient_vec.push_back(ingredient);
                 }
                 else {
                     iss >> temp;
@@ -69,7 +71,7 @@ void SmartRefrigerator::addRecipeFromFile()
                 idx++;
             }
             
-            recipe = new Recipe(mealName, ingredient, satisfaction);
+            recipe = new Recipe(mealName, ingredient_vec, satisfaction);
             // TO-DO : why is this not working???????
 
             recipes.push_back(*recipe);
