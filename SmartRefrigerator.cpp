@@ -116,11 +116,176 @@ void SmartRefrigerator::showRecipe()
  * from a possible combination
  */
 void SmartRefrigerator::recommendMealCourses() {
-  /**
-   * ===============================================
-   * ======== TODO: Implement this function ========
-   * ===============================================
-   */
+  vector<tuple<string, string, string, int, int>> total_score;
+    for (auto iter = recipes.begin(); iter <= recipes.end() - 3; iter++)
+    {
+        bool possible_course;
+        int bacon_num = 0;
+        int onion_num = 0;
+        int pasta_num = 0;
+        int tomato_num = 0;
+        int egg_num = 0;
+        int bread_num = 0;
+        int lettuce_num = 0;
+        int milk_num = 0;
+        vector<pair<string, int>> course_require;
+        for (int j = 0; j < 3; j++)
+        {
+            for (int i = 0; i < (iter + j)->getIngredients().size(); i++)
+            {
+                if ((iter + j)->getIngredients()[i].first == "bacon")
+                {
+                    bacon_num = bacon_num + (iter + j)->getIngredients()[i].second;
+                }
+                else if ((iter + j)->getIngredients()[i].first == "onion")
+                {
+                    onion_num = onion_num + (iter + j)->getIngredients()[i].second;
+                }
+                else if ((iter + j)->getIngredients()[i].first == "pasta")
+                {
+                    pasta_num = pasta_num + (iter + j)->getIngredients()[i].second;
+                }
+                else if ((iter + j)->getIngredients()[i].first == "tomato")
+                {
+                    tomato_num = tomato_num + (iter + j)->getIngredients()[i].second;
+                }
+                else if ((iter + j)->getIngredients()[i].first == "egg")
+                {
+                    egg_num = egg_num + (iter + j)->getIngredients()[i].second;
+                }
+                else if ((iter + j)->getIngredients()[i].first == "bread")
+                {
+                    bread_num = bread_num + (iter + j)->getIngredients()[i].second;
+                }
+                else if ((iter + j)->getIngredients()[i].first == "lettuce")
+                {
+                    lettuce_num = lettuce_num + (iter + j)->getIngredients()[i].second;
+                }
+                else if ((iter + j)->getIngredients()[i].first == "milk")
+                {
+                    milk_num = milk_num + (iter + j)->getIngredients()[i].second;
+                }
+            }
+        }
+        // course에 필요한 3가지 meal에 포함되는 총 식재로의 종류와 개수
+        if (bacon_num != 0)
+        {
+            course_require.push_back(make_pair("bacon", bacon_num));
+        }
+        if (onion_num != 0)
+        {
+            course_require.push_back(make_pair("onion", onion_num));
+        }
+        if (pasta_num != 0)
+        {
+            course_require.push_back(make_pair("pasta", pasta_num));
+        }
+        if (tomato_num != 0)
+        {
+            course_require.push_back(make_pair("tomato", tomato_num));
+        }
+        if (egg_num != 0)
+        {
+            course_require.push_back(make_pair("egg", egg_num));
+        }
+        if (bread_num != 0)
+        {
+            course_require.push_back(make_pair("bread", bread_num));
+        }
+        if (lettuce_num != 0)
+        {
+            course_require.push_back(make_pair("lettuce", lettuce_num));
+        }
+        if (milk_num != 0)
+        {
+            course_require.push_back(make_pair("milk", milk_num));
+        }
+        for (int i = 0; i < course_require.size(); i++)
+        {
+            auto iter_temp = foodList.find(course_require[i].first);
+            if (iter_temp == foodList.end()) // course에 필요한 식재료 중 하나라도 냉장고에 존재하지 않을 경우 impossible한 course
+            {
+                possible_course = false;
+                break;
+            }
+            else
+            {
+                string temp = course_require[i].first;
+                if (foodList[temp].size() >= course_require[i].second)
+                {
+                    possible_course = true;
+                }
+                else // course에 필요한 식재료 중 하나라도 존재하긴 하지만 필요한 개수보다 작을 경우 impossible한 course
+                {
+                    possible_course = false;
+                    break;
+                }
+            }
+        }
+        if (possible_course == true)
+        {
+            int temp1 = 0; // satisfy score
+            for (int i = 0; i < 3; i++)
+            {
+                temp1 = temp1 + (iter + i)->getScore();
+            }
+            int temp2 = 0; // expiration score
+            for (int i = 0; i < course_require.size(); i++)
+            {
+                string temp = course_require[i].first;
+                temp2 = temp2 + (foodList[temp].size() - course_require[i].second) * foodList[temp][0]->getExp();
+            }
+            total_score.push_back(make_tuple(iter->getName(), (iter + 1)->getName(), (iter + 2)->getName(), temp1, temp2));
+        }
+    }
+    int highest_index = 0;
+    int second_highest_index = 0;
+    int third_highest_index = 0;
+    int max1 = get<3>(total_score[0]) + get<4>(total_score[0]);
+    for (int i = 0; i < total_score.size(); i++)
+    {
+        if (get<3>(total_score[i]) + get<4>(total_score[i]) > max1)
+        {
+            max1 = get<3>(total_score[i]) + get<4>(total_score[i]);
+            highest_index = i;
+        }
+    }
+    int max2 = get<3>(total_score[0]) + get<4>(total_score[0]);
+    for (int i = 0; i < total_score.size(); i++)
+    {
+        if (i != highest_index)
+        {
+            if (get<3>(total_score[i]) + get<4>(total_score[i]) > max2)
+            {
+                max2 = get<3>(total_score[i]) + get<4>(total_score[i]);
+                second_highest_index = i;
+            }
+        }
+    }
+    int max3 = get<3>(total_score[0]) + get<4>(total_score[0]);
+    for (int i = 0; i < total_score.size(); i++)
+    {
+        if (i != highest_index && i != second_highest_index)
+        {
+            if (get<3>(total_score[i]) + get<4>(total_score[i]) > max3)
+            {
+                max3 = get<3>(total_score[i]) + get<4>(total_score[i]);
+                third_highest_index = i;
+            }
+        }
+    }
+    double satis_score1 = 1;
+    double satis_score2 = get<3>(total_score[second_highest_index])/get<3>(total_score[highest_index]);
+    double satis_score3 = get<3>(total_score[third_highest_index])/get<3>(total_score[highest_index]);
+    double expir_score1 = 1;
+    double expir_score2 = get<4>(total_score[second_highest_index])/get<4>(total_score[highest_index]);
+    double expir_score3 = get<4>(total_score[third_highest_index])/get<4>(total_score[highest_index]);
+    cout << "1. " << get<0>(total_score[highest_index]) << "2. " << get<1>(total_score[highest_index]) << "3. " << get<2>(total_score[highest_index]) << "  /  total score sum : " << 
+    satis_score1+expir_score1 << "  (" << satis_score1 << " / " << expir_score1 << ")" << endl;
+    cout << "1. " << get<0>(total_score[second_highest_index]) << "2. " << get<1>(total_score[second_highest_index]) << "3. " << get<2>(total_score[second_highest_index]) << "  /  total score sum : " << 
+    satis_score2+expir_score2 << "  (" << satis_score2 << " / " << expir_score2 << ")" << endl;
+    cout << "1. " << get<0>(total_score[third_highest_index]) << "2. " << get<1>(total_score[third_highest_index]) << "3. " << get<2>(total_score[third_highest_index]) << "  /  total score sum : " << 
+    satis_score3+expir_score3 << "  (" << satis_score3 << " / " << expir_score3 << ")" << endl;
 }
 
 /**
