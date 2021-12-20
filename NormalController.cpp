@@ -17,8 +17,13 @@
  */
 bool NormalController::stackFood(const string name, intPair foodSize, int exp)
 {
+    FoodPtr food;
+
     if (shelves.size() == 0)
         shelves.push_back(Shelf(0));
+    
+    if (foodList.find(name) == foodList.end())
+        foodList.insert(pair<string, vector<FoodPtr>>(name, { }));
 
     vector<FoodPtr> &v = foodList[name];
 
@@ -29,28 +34,20 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
             if (emptyPos + foodSize.first >= size.first) // 이 shelf에는 못들어간다!
                 continue;
             else { // 이 shelf에 들어갈만한 빈공간이 충분하다!
-                FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), emptyPos, elem.height);
+                food = new FoodInFridge(Food(name, foodSize, exp), emptyPos, elem.height);
 
                 elem.vec.push_back(food);
                 v.push_back(food);
-                cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
-                return true;
-                
-                // 같은 항목의 음식이 들어있지 않다면
-                foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
+                cout << "Inserting " << name << " into x: " << emptyPos << ", y: " << elem.height << endl;
                 return true;
             }
         }
         else { // shelf 가 빈 경우
-            FoodPtr food = new FoodInFridge(Food(name, foodSize, exp), 0, elem.height);
+            food = new FoodInFridge(Food(name, foodSize, exp), 0, elem.height);
 
             elem.vec.push_back(food);
             v.push_back(food);
-            cout << "Inserting " << name << " into x: " << elem.height << "y: " << 0 << endl;
-            return true;
-
-            // 같은 항목의 음식이 들어있지 않다면
-            foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
+            cout << "Inserting " << name << " into x: " << 0 << ", y: " << elem.height << endl;
             return true;
         } 
     }
@@ -64,11 +61,7 @@ bool NormalController::stackFood(const string name, intPair foodSize, int exp)
 
     shelves.back().vec.push_back(food);
     v.push_back(food);
-    cout << "Inserting " << name << " into x: " << shelves.back().height << "y: " << 0 << endl;
-    return true;
-
-    // 같은 항목의 음식이 들어있지 않다면
-    foodList.insert(pair<string, vector<FoodPtr>>(name, { food }));
+    cout << "Inserting " << name << " into x: " << shelves.back().height << ", y: " << 0 << endl;
     return true;
 }
 
