@@ -37,11 +37,66 @@ int SmartController::maxHeight(Shelf &shelf)
  */
 bool SmartController::stackFood(const string name, intPair foodSize, int exp)
 {   
-     /**
-     * ===============================================
-     * ======== TODO: Implement this function ========
-     * ===============================================
-     */
+    FoodPtr food;
+
+    bool placed = false;
+    int x, y;
+
+    if (shelves.size() == 0)
+        shelves.push_back(Shelf(0));
+    
+    if (foodList.find(name) == foodList.end())
+        foodList.insert(pair<string, vector<FoodPtr>>(name, { }));
+
+    if (foodSize.first > size.first) // 음식이 냉장고보다 큰 경우
+        return false;
+
+    vector<FoodPtr> &v = foodList[name];
+
+    for (auto & elem : shelves) {
+        int n = elem.vec.size();
+        
+        if (n >= 1) { // shelf 가 비지 않은 경우
+            if (elem.vec[n - 1]->getPos().first + elem.vec[n - 1]->getSize().first + foodSize.first >= size.first
+                || elem.vec[n - 1]->getPos().second + foodSize.second >= size.second) 
+                continue;
+            else {
+                x = elem.vec[n - 1]->getPos().first + elem.vec[n - 1]->getSize().first;
+                y = elem.height;
+                placed = true;
+            }
+        }
+
+        else { // shelf 가 빈 경우
+            x = 0;
+            y = elem.height;
+            placed = true;
+        } 
+
+        if (placed) {
+            food = new FoodInFridge(Food(name, foodSize, exp), x, y);  
+            elem.vec.push_back(food);
+            v.push_back(food);
+
+            cout << "Inserting " << name << " into x: " << x << ", y: " << y << endl;
+            return true;
+        }
+    }
+
+    // 새로운 shelf를 추가해야한 경우 (모든 shelf를 다 돌았는데 배치를 못받은 경우에 대해)
+    if (shelves.back().height + maxHeight(shelves.back()) > size.second)
+        return false;
+    
+    shelves.push_back(Shelf(shelves.back().height + maxHeight(shelves.back())));
+    x = 0;
+    y = shelves.back().height;
+    food = new FoodInFridge(Food(name, foodSize, exp), x, y);
+
+    shelves.back().vec.push_back(food);
+    v.push_back(food);
+
+    cout << "Inserting " << name << " into x: 0, y: " << shelves.back().height << endl;
+    return true;
     return false;
 }
 
@@ -55,10 +110,86 @@ bool SmartController::stackFood(const string name, intPair foodSize, int exp)
  */
 bool SmartController::popFood(const string food_name) // void
 {
-    /**
-     * ===============================================
-     * ======== TODO: Implement this function ========
-     * ===============================================
-     */
-    return false;
+    FoodPtr min;
+    bool moveX = false;
+    bool moveY = false;
+    bool erased = false;
+    int foodSize(0);
+    int deltaY(0);
+    vector<FoodPtr> temp = {};
+
+    min = *findMinExpFood(food_name);
+    vector<FoodPtr> &v = foodList[food_name];
+
+    foodSize = v.front()->getSize().first;
+
+    for (auto & shelf : shelves)
+        for (auto & elem : shelf.vec)
+            if (elem->getName() == food_name && elem->getExp() == min->getExp())
+                temp.push_back(elem);
+    if (temp.size() == 0)
+        return false;
+    
+    sort(temp.begin(), temp.end(), comparePos);
+
+    cout << "position to pop : x: " << temp.back()->getPos().first << ", y: " << temp.back()->getPos().second << endl;
+    cout << food_name << " with expire date " << min->getExp() << " has been popped" << endl;
+
+    for (int i = 0; i < v.size(); i++) {
+        if (v[i]->getPos() == temp.back()->getPos()) {
+            v.erase(v.begin() + i);
+            break;
+        }
+    }
+
+    for (auto & shelf : shelves) {
+        int oldMax = maxHeight(shelf);
+        if (moveY) shelf.height -= deltaY;
+        int n = shelf.vec.size();
+        for (int i = 0; i < n; i++) {
+            if (temp.back()->getPos() == shelf.vec[i]->getPos() && temp.back()->getExp() == shelf.vec[i]->getExp() 
+                && temp.back()->getName() == shelf.vec[i]->getName()
+                && !erased) {
+                shelf.vec.erase(shelf.vec.begin() + i);
+                erased = true;
+                // shelf 재정렬 관련 모든게 다 여기에 들어가야함!
+                if (shelf.height != shelves.back().height) { // 가장 위 shelf가 아닌 경우
+                    int newMax = maxHeight(shelf);
+                    if (newMax < oldMax) { moveY = true; deltaY = oldMax - newMax; }
+                }
+                moveX = true;
+                continue;
+            }
+            if (moveX) {
+                int newX = shelf.vec[i - 1]->getPos().first - foodSize;
+                int y = shelf.height;
+                intPair newPos(newX, y);
+
+                vector<FoodPtr> &temp = foodList[shelf.vec[i - 1]->getName()];
+                for (int j = 0; j < temp.size(); j++) {
+                    if (temp[j]->getExp() == shelf.vec[i - 1]->getExp() && temp[j]->getPos() == shelf.vec[i - 1]->getPos()) {
+                        temp[j]->setPos(newPos);
+                        break;
+                    }
+                }
+                shelf.vec[i - 1]->setPos(newPos);
+            }
+            if (moveY && !moveX) {
+                int x = shelf.vec[i]->getPos().first;
+                int newY = shelf.height;
+                intPair newPos(x, newY);
+
+                vector<FoodPtr> &temp = foodList[shelf.vec[i]->getName()];
+                for (int j = 0; j < temp.size(); j++) {
+                    if (temp[j]->getExp() == shelf.vec[i]->getExp() && temp[j]->getPos() == shelf.vec[i]->getPos()) {
+                        temp[j]->setPos(newPos);
+                        break;
+                    }
+                }
+                shelf.vec[i]->setPos(newPos);
+            }
+        } 
+        moveX = false;
+    }
+    return true;
 }
