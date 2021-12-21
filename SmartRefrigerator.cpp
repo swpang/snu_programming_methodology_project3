@@ -126,77 +126,32 @@ void SmartRefrigerator::recommendMealCourses() {
         int bread_num = 0;
         int lettuce_num = 0;
         int milk_num = 0;
-        vector<pair<string, int>> course_require;
-        for (int j = 0; j < 3; j++)
+        vector<string> all_ingredients;
+        for(int i=0; i<3; i++)
         {
-            for (int i = 0; i < (iter + j)->getIngredients().size(); i++)
+            for(int j=0; j<(iter+i)->getIngredients().size(); j++)
             {
-                if ((iter + j)->getIngredients()[i].first == "bacon")
-                {
-                    bacon_num = bacon_num + (iter + j)->getIngredients()[i].second;
-                }
-                else if ((iter + j)->getIngredients()[i].first == "onion")
-                {
-                    onion_num = onion_num + (iter + j)->getIngredients()[i].second;
-                }
-                else if ((iter + j)->getIngredients()[i].first == "pasta")
-                {
-                    pasta_num = pasta_num + (iter + j)->getIngredients()[i].second;
-                }
-                else if ((iter + j)->getIngredients()[i].first == "tomato")
-                {
-                    tomato_num = tomato_num + (iter + j)->getIngredients()[i].second;
-                }
-                else if ((iter + j)->getIngredients()[i].first == "egg")
-                {
-                    egg_num = egg_num + (iter + j)->getIngredients()[i].second;
-                }
-                else if ((iter + j)->getIngredients()[i].first == "bread")
-                {
-                    bread_num = bread_num + (iter + j)->getIngredients()[i].second;
-                }
-                else if ((iter + j)->getIngredients()[i].first == "lettuce")
-                {
-                    lettuce_num = lettuce_num + (iter + j)->getIngredients()[i].second;
-                }
-                else if ((iter + j)->getIngredients()[i].first == "milk")
-                {
-                    milk_num = milk_num + (iter + j)->getIngredients()[i].second;
-                }
+                all_ingredients.push_back((iter+i)->getIngredients()[j].first);
             }
         }
-        // course에 필요한 3가지 meal에 포함되는 총 식재로의 종류와 개수
-        if (bacon_num != 0)
+        all_ingredients.erase(unique(all_ingredients.begin(), all_ingredients.end()), all_ingredients.end());
+        vector<pair<string, int>> course_require;
+        for(int i=0; i<all_ingredients.size(); i++)
         {
-            course_require.push_back(make_pair("bacon", bacon_num));
+            course_require.push_back(make_pair(all_ingredients[i], 0));
         }
-        if (onion_num != 0)
+        for (int i = 0; i < 3; i++)
         {
-            course_require.push_back(make_pair("onion", onion_num));
-        }
-        if (pasta_num != 0)
-        {
-            course_require.push_back(make_pair("pasta", pasta_num));
-        }
-        if (tomato_num != 0)
-        {
-            course_require.push_back(make_pair("tomato", tomato_num));
-        }
-        if (egg_num != 0)
-        {
-            course_require.push_back(make_pair("egg", egg_num));
-        }
-        if (bread_num != 0)
-        {
-            course_require.push_back(make_pair("bread", bread_num));
-        }
-        if (lettuce_num != 0)
-        {
-            course_require.push_back(make_pair("lettuce", lettuce_num));
-        }
-        if (milk_num != 0)
-        {
-            course_require.push_back(make_pair("milk", milk_num));
+            for (int j = 0; j < (iter + i)->getIngredients().size(); j++)
+            {
+                for(int k=0; k<course_require.size(); k++)
+                {
+                    if((iter+i)->getIngredients()[j].first == course_require[k].first)
+                    {
+                        course_require[k].second++;
+                    }
+                }
+            }
         }
         for (int i = 0; i < course_require.size(); i++)
         {
@@ -278,11 +233,11 @@ void SmartRefrigerator::recommendMealCourses() {
     double expir_score1 = 1;
     double expir_score2 = get<4>(total_score[second_highest_index])/get<4>(total_score[highest_index]);
     double expir_score3 = get<4>(total_score[third_highest_index])/get<4>(total_score[highest_index]);
-    cout << "1. " << get<0>(total_score[highest_index]) << "2. " << get<1>(total_score[highest_index]) << "3. " << get<2>(total_score[highest_index]) << "  /  total score sum : " << 
+    cout << "1. " << get<0>(total_score[highest_index]) << "  2. " << get<1>(total_score[highest_index]) << "  3. " << get<2>(total_score[highest_index]) << "  /  total score sum : " << 
     satis_score1+expir_score1 << "  (" << satis_score1 << " / " << expir_score1 << ")" << endl;
-    cout << "1. " << get<0>(total_score[second_highest_index]) << "2. " << get<1>(total_score[second_highest_index]) << "3. " << get<2>(total_score[second_highest_index]) << "  /  total score sum : " << 
+    cout << "1. " << get<0>(total_score[second_highest_index]) << "  2. " << get<1>(total_score[second_highest_index]) << "  3. " << get<2>(total_score[second_highest_index]) << "  /  total score sum : " << 
     satis_score2+expir_score2 << "  (" << satis_score2 << " / " << expir_score2 << ")" << endl;
-    cout << "1. " << get<0>(total_score[third_highest_index]) << "2. " << get<1>(total_score[third_highest_index]) << "3. " << get<2>(total_score[third_highest_index]) << "  /  total score sum : " << 
+    cout << "1. " << get<0>(total_score[third_highest_index]) << "  2. " << get<1>(total_score[third_highest_index]) << "  3. " << get<2>(total_score[third_highest_index]) << "  /  total score sum : " << 
     satis_score3+expir_score3 << "  (" << satis_score3 << " / " << expir_score3 << ")" << endl;
 }
 
