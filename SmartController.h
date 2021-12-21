@@ -9,6 +9,7 @@ public:
 
     bool stackFood(const string, intPair, int);
     bool popFood(const string);
+    static bool compareScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2);
 
 private:
     int maxHeight(Shelf &);

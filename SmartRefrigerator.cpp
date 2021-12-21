@@ -19,6 +19,30 @@ SmartRefrigerator::SmartRefrigerator()
     controller = new SmartController(size, foodList);
 };
 
+bool SmartRefrigerator::compareScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2) {
+    int score1 = get<3>(t1) + get<4>(t1);
+    int score2 = get<3>(t2) + get<4>(t2);
+
+    if (score1 < score2) return true;
+    else return false;  
+}
+
+bool SmartRefrigerator::compareExpScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2) {
+    int score1 = get<4>(t1);
+    int score2 = get<4>(t2);
+
+    if (score1 < score2) return true;
+    else return false;  
+}
+
+bool SmartRefrigerator::compareSatScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2) {
+    int score1 = get<3>(t1);
+    int score2 = get<3>(t2);
+
+    if (score1 < score2) return true;
+    else return false;  
+}
+
 /**
  * add recipes from a text file (.txt)
  * This function should add a new recipe object with the given info from the
@@ -114,7 +138,7 @@ void SmartRefrigerator::showRecipe()
  * from a possible combination
  */
 void SmartRefrigerator::recommendMealCourses() {
-  vector<tuple<string, string, string, int, int>> total_score; //만들 수 있는 3가지 음식의 (음식이름, 음식이름, 음식이름, satisfy_score 총합, expiration_score 총합)
+	vector<tuple<string, string, string, int, int>> total_score; //만들 수 있는 3가지 음식의 (음식이름, 음식이름, 음식이름, satisfy_score 총합, expiration_score 총합)
     for (auto iter = recipes.begin(); iter <= recipes.end() - 3; iter++)
     {
         bool possible_course; //만들 수 있는 3가지 음식 조합인가?
@@ -185,55 +209,21 @@ void SmartRefrigerator::recommendMealCourses() {
     }
     //만들 수 있는 3가지 조합들 중 가장 높은 expiration score + satisfy score를 가지는 조합의 total_score 내에서의 index를 highest_index
     //2번째 높은 조합의 index를 second_highest_index, 3번째 높은 조합의 index를 third_highest_index
-    int highest_index = 0;
-    int second_highest_index = 0;
-    int third_highest_index = 0;
-    int max1 = get<3>(total_score[0]) + get<4>(total_score[0]);
-    for (int i = 0; i < total_score.size(); i++)
-    {
-        if (get<3>(total_score[i]) + get<4>(total_score[i]) > max1)
-        {
-            max1 = get<3>(total_score[i]) + get<4>(total_score[i]);
-            highest_index = i;
-        }
-    }
-    int max2 = get<3>(total_score[0]) + get<4>(total_score[0]);
-    for (int i = 0; i < total_score.size(); i++)
-    {
-        if (i != highest_index)
-        {
-            if (get<3>(total_score[i]) + get<4>(total_score[i]) > max2)
-            {
-                max2 = get<3>(total_score[i]) + get<4>(total_score[i]);
-                second_highest_index = i;
-            }
-        }
-    }
-    int max3 = get<3>(total_score[0]) + get<4>(total_score[0]);
-    for (int i = 0; i < total_score.size(); i++)
-    {
-        if (i != highest_index && i != second_highest_index)
-        {
-            if (get<3>(total_score[i]) + get<4>(total_score[i]) > max3)
-            {
-                max3 = get<3>(total_score[i]) + get<4>(total_score[i]);
-                third_highest_index = i;
-            }
-        }
-    }
-    //가장 높은 satisfy_score, expiration_score 기준으로 normalize 후 출력
-    double satis_score1 = 1;
-    double satis_score2 = get<3>(total_score[second_highest_index])/get<3>(total_score[highest_index]);
-    double satis_score3 = get<3>(total_score[third_highest_index])/get<3>(total_score[highest_index]);
-    double expir_score1 = 1;
-    double expir_score2 = get<4>(total_score[second_highest_index])/get<4>(total_score[highest_index]);
-    double expir_score3 = get<4>(total_score[third_highest_index])/get<4>(total_score[highest_index]);
-    cout << "1. " << get<0>(total_score[highest_index]) << "  2. " << get<1>(total_score[highest_index]) << "  3. " << get<2>(total_score[highest_index]) << "  /  total score sum : " << 
-    satis_score1+expir_score1 << "  (" << satis_score1 << " / " << expir_score1 << ")" << endl;
-    cout << "1. " << get<0>(total_score[second_highest_index]) << "  2. " << get<1>(total_score[second_highest_index]) << "  3. " << get<2>(total_score[second_highest_index]) << "  /  total score sum : " << 
-    satis_score2+expir_score2 << "  (" << satis_score2 << " / " << expir_score2 << ")" << endl;
-    cout << "1. " << get<0>(total_score[third_highest_index]) << "  2. " << get<1>(total_score[third_highest_index]) << "  3. " << get<2>(total_score[third_highest_index]) << "  /  total score sum : " << 
-    satis_score3+expir_score3 << "  (" << satis_score3 << " / " << expir_score3 << ")" << endl;
+    
+	sort(total_score.begin(), total_score.end(), compareExpScore);
+	double e_norm = get<4>(total_score.back());
+	sort(total_score.begin(), total_score.end(), compareSatScore);
+    double s_norm = get<3>(total_score.back());
+
+	sort(total_score.begin(), total_score.end(), compareScore);
+	
+	int count(0);
+	while (total_score.size() != 0 && count < 3) {
+		count++;
+		cout << "1. " << get<0>(total_score.back()) << "  2. " << get<1>(total_score.back()) << "  3. " << get<2>(total_score.back()) << "  /  total score sum : ";
+    	cout << get<3>(total_score.back()) / s_norm + get<4>(total_score.back()) / e_norm << "  (" << get<3>(total_score.back()) / s_norm << " / " << get<4>(total_score.back()) / e_norm << ")" << endl;
+		total_score.pop_back();
+	}
 }
 
 /**

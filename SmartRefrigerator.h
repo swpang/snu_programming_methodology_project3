@@ -16,6 +16,9 @@ public:
     void showRecipe();
     void recommendMealCourses();
     int menuSelect();
+    static bool compareScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2);
+    static bool compareExpScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2);
+    static bool compareSatScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2);
 
 private:
     recipeVec recipes;
