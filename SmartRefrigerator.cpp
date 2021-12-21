@@ -188,7 +188,9 @@ void SmartRefrigerator::recommendMealCourses() {
     int highest_index = 0;
     int second_highest_index = 0;
     int third_highest_index = 0;
-    int max1 = get<3>(total_score[0]) + get<4>(total_score[0]);
+    int max1 = 0;
+    int max2 = 0;
+    int max3 = 0;
     for (int i = 0; i < total_score.size(); i++)
     {
         if (get<3>(total_score[i]) + get<4>(total_score[i]) > max1)
@@ -197,7 +199,6 @@ void SmartRefrigerator::recommendMealCourses() {
             highest_index = i;
         }
     }
-    int max2 = get<3>(total_score[0]) + get<4>(total_score[0]);
     for (int i = 0; i < total_score.size(); i++)
     {
         if (i != highest_index)
@@ -209,7 +210,6 @@ void SmartRefrigerator::recommendMealCourses() {
             }
         }
     }
-    int max3 = get<3>(total_score[0]) + get<4>(total_score[0]);
     for (int i = 0; i < total_score.size(); i++)
     {
         if (i != highest_index && i != second_highest_index)
