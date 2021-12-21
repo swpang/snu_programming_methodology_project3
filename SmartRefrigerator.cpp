@@ -114,19 +114,11 @@ void SmartRefrigerator::showRecipe()
  * from a possible combination
  */
 void SmartRefrigerator::recommendMealCourses() {
-  vector<tuple<string, string, string, int, int>> total_score;
+  vector<tuple<string, string, string, int, int>> total_score; //만들 수 있는 3가지 음식의 (음식이름, 음식이름, 음식이름, satisfy_score 총합, expiration_score 총합)
     for (auto iter = recipes.begin(); iter <= recipes.end() - 3; iter++)
     {
-        bool possible_course;
-        int bacon_num = 0;
-        int onion_num = 0;
-        int pasta_num = 0;
-        int tomato_num = 0;
-        int egg_num = 0;
-        int bread_num = 0;
-        int lettuce_num = 0;
-        int milk_num = 0;
-        vector<string> all_ingredients;
+        bool possible_course; //만들 수 있는 3가지 음식 조합인가?
+        vector<string> all_ingredients; //3가지 음식을 만드는데 필요한 식재료의 이름을 종류별로 중복되지 않게 all_ingredients 벡터에 저장 
         for(int i=0; i<3; i++)
         {
             for(int j=0; j<(iter+i)->getIngredients().size(); j++)
@@ -135,7 +127,7 @@ void SmartRefrigerator::recommendMealCourses() {
             }
         }
         all_ingredients.erase(unique(all_ingredients.begin(), all_ingredients.end()), all_ingredients.end());
-        vector<pair<string, int>> course_require;
+        vector<pair<string, int>> course_require; //course_require에 all_ingredients에 저장되어 있는 (식재료의 종류, 갯수)를 pair형태로 push_back
         for(int i=0; i<all_ingredients.size(); i++)
         {
             course_require.push_back(make_pair(all_ingredients[i], 0));
@@ -191,6 +183,8 @@ void SmartRefrigerator::recommendMealCourses() {
             total_score.push_back(make_tuple(iter->getName(), (iter + 1)->getName(), (iter + 2)->getName(), temp1, temp2));
         }
     }
+    //만들 수 있는 3가지 조합들 중 가장 높은 expiration score + satisfy score를 가지는 조합의 total_score 내에서의 index를 highest_index
+    //2번째 높은 조합의 index를 second_highest_index, 3번째 높은 조합의 index를 third_highest_index
     int highest_index = 0;
     int second_highest_index = 0;
     int third_highest_index = 0;
@@ -227,6 +221,7 @@ void SmartRefrigerator::recommendMealCourses() {
             }
         }
     }
+    //가장 높은 satisfy_score, expiration_score 기준으로 normalize 후 출력
     double satis_score1 = 1;
     double satis_score2 = get<3>(total_score[second_highest_index])/get<3>(total_score[highest_index]);
     double satis_score3 = get<3>(total_score[third_highest_index])/get<3>(total_score[highest_index]);
