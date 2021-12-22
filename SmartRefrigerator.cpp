@@ -261,17 +261,17 @@ void SmartRefrigerator::recommendMealCourses()
     sort(totalScore.begin(), totalScore.end(), compareSatScore);
     double s_norm = get<1>(totalScore.back());
 
+    for (auto elem : totalScore) {
+        cout << get<0>(elem)[0].first << ", " << get<0>(elem)[1].first <<
+            ", " << get<0>(elem)[2].first << ": " << get<1>(elem) << ", " << get<2>(elem) << " = " << get<1>(elem) + get<2>(elem) << endl;
+    }
+
     for (int i = 0; i < totalScore.size(); i++) {
         get<1>(totalScore[i]) /= s_norm;
         get<2>(totalScore[i]) /= e_norm;
     }
 
     sort(totalScore.begin(), totalScore.end(), compareScore);
-
-    for (auto elem : totalScore) {
-        cout << get<0>(elem)[0].first << ", " << get<0>(elem)[1].first <<
-            ", " << get<0>(elem)[2].first << ": " << get<1>(elem) << ", " << get<2>(elem) << " = " << get<1>(elem) + get<2>(elem) << endl;
-    }
 
     int count(0);
     while (totalScore.size() != 0 && count < 3) {
