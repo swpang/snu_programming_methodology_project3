@@ -19,10 +19,10 @@ SmartRefrigerator::SmartRefrigerator()
     controller = new SmartController(size, foodList);
 };
 
-bool SmartRefrigerator::compareScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2)
+bool SmartRefrigerator::compareScore(const tuple<vector<RecipeInfo>, double, double> t1, const tuple<vector<RecipeInfo>, double, double> t2)
 {
-    int score1 = get<3>(t1) + get<4>(t1);
-    int score2 = get<3>(t2) + get<4>(t2);
+    double score1 = get<1>(t1) + get<2>(t1);
+    double score2 = get<1>(t2) + get<2>(t2);
 
     if (score1 < score2)
         return true;
@@ -30,10 +30,10 @@ bool SmartRefrigerator::compareScore(const tuple<string, string, string, int, in
         return false;
 }
 
-bool SmartRefrigerator::compareExpScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2)
+bool SmartRefrigerator::compareExpScore(const tuple<vector<RecipeInfo>, double, double> t1, const tuple<vector<RecipeInfo>, double, double> t2)
 {
-    int score1 = get<4>(t1);
-    int score2 = get<4>(t2);
+    double score1 = get<2>(t1);
+    double score2 = get<2>(t2);
 
     if (score1 < score2)
         return true;
@@ -41,10 +41,10 @@ bool SmartRefrigerator::compareExpScore(const tuple<string, string, string, int,
         return false;
 }
 
-bool SmartRefrigerator::compareSatScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2)
+bool SmartRefrigerator::compareSatScore(const tuple<vector<RecipeInfo>, double, double> t1, const tuple<vector<RecipeInfo>, double, double> t2)
 {
-    int score1 = get<3>(t1);
-    int score2 = get<3>(t2);
+    double score1 = get<1>(t1);
+    double score2 = get<1>(t2);
 
     if (score1 < score2)
         return true;
@@ -155,111 +155,130 @@ void SmartRefrigerator::showRecipe()
  */
 void SmartRefrigerator::recommendMealCourses()
 {
-    vector<tuple<string, string, string, int, int>> total_score; //만들 수 있는 3가지 음식의 (음식이름, 음식이름, 음식이름, satisfy_score 총합, expiration_score 총합)
-    for (auto iter1 = recipes.begin(); iter1 <= recipes.end() - 3; iter1++)
-    {
-        for (auto iter2 = (iter1 + 1); iter2 <= recipes.end() - 2; iter2++)
-        {
-            for (auto iter3 = (iter2 + 1); iter3 <= recipes.end() - 1; iter3++)
-            {
-                bool possible_course;           //만들 수 있는 3가지 음식 조합인가?
-                vector<string> all_ingredients; // 3가지 음식을 만드는데 필요한 식재료의 이름을 종류별로 중복되지 않게 all_ingredients 벡터에 저장
-                for (int i = 0; i < iter1->getIngredients().size(); i++)
-                {
-                    all_ingredients.push_back(iter1->getIngredients()[i].first);
-                }
-                for (int i = 0; i < iter2->getIngredients().size(); i++)
-                {
-                    all_ingredients.push_back(iter2->getIngredients()[i].first);
-                }
-                for (int i = 0; i < iter3->getIngredients().size(); i++)
-                {
-                    all_ingredients.push_back(iter3->getIngredients()[i].first);
-                }
-                all_ingredients.erase(unique(all_ingredients.begin(), all_ingredients.end()), all_ingredients.end());
-                vector<pair<string, int>> course_require; // course_require에 all_ingredients에 저장되어 있는 (식재료의 종류, 갯수)를 pair형태로 push_back
-                for (int i = 0; i < all_ingredients.size(); i++)
-                {
-                    course_require.push_back(make_pair(all_ingredients[i], 0));
-                }
-                for (int i = 0; i < course_require.size(); i++)
-                {
-                    for (int j = 0; j < iter1->getIngredients().size(); j++)
-                    {
-                        if (iter1->getIngredients()[j].first == course_require[i].first)
-                        {
-                            course_require[i].second = iter1->getIngredients()[j].second;
-                        }
-                    }
-                    for (int j = 0; j < iter2->getIngredients().size(); j++)
-                    {
-                        if (iter2->getIngredients()[j].first == course_require[i].first)
-                        {
-                            course_require[i].second = iter2->getIngredients()[j].second;
-                        }
-                    }
-                    for (int j = 0; j < iter3->getIngredients().size(); j++)
-                    {
-                        if (iter3->getIngredients()[j].first == course_require[i].first)
-                        {
-                            course_require[i].second = iter3->getIngredients()[j].second;
-                        }
-                    }
-                }
-                for (int i = 0; i < course_require.size(); i++)
-                {
-                    auto iter_temp = foodList.find(course_require[i].first);
-                    if (iter_temp == foodList.end()) // course에 필요한 식재료 중 하나라도 냉장고에 존재하지 않을 경우 impossible한 course
-                    {
-                        possible_course = false;
-                        break;
-                    }
-                    else
-                    {
-                        string temp = course_require[i].first;
-                        if (foodList[temp].size() >= course_require[i].second)
-                        {
-                            possible_course = true;
-                        }
-                        else // course에 필요한 식재료 중 하나라도 존재하긴 하지만 필요한 개수보다 작을 경우 impossible한 course
-                        {
-                            possible_course = false;
-                            break;
-                        }
-                    }
-                }
-                if (possible_course == true)
-                {
-                    int temp1 = 0; // satisfy score
-                    temp1 = temp1 + iter1->getScore() + iter2 ->getScore() + iter3 ->getScore();
-                    int temp2 = 0; // expiration score
-                    for (int i = 0; i < course_require.size(); i++)
-                    {
-                        string temp = course_require[i].first;
-                        temp2 = temp2 + (foodList[temp].size() - course_require[i].second) * foodList[temp][0]->getExp();
-                    }
-                    total_score.push_back(make_tuple(iter1->getName(), iter2->getName(), iter3->getName(), temp1, temp2));
-                }
+	if (recipes.size() < 3) {
+		cout << "Too few recipes to recommend a meal course!" << endl;
+		return;
+	}		
+
+    vector<Course> totalScore; //만들 수 있는 3가지 음식의 (음식이름, 음식이름, 음식이름, satisfy_score 총합, expiration_score 총합)
+	vector<map<string, double>> ingredients;
+
+	// Brute Force Search for all possible meal combinations (O(n^3))
+	for (int i = 0; i < recipes.size(); i++) {
+        for (int j = 0; j < recipes.size(); j++) {
+            for (int k = 0; k < recipes.size(); k++) {
+                if (i < j && j < k) {
+					vector<RecipeInfo> recipeList;
+
+					RecipeInfo recipe1(recipes[i].getName(), i);
+					RecipeInfo recipe2(recipes[j].getName(), j);
+					RecipeInfo recipe3(recipes[k].getName(), k);
+
+					recipeList.push_back(recipe1);
+					recipeList.push_back(recipe2);
+					recipeList.push_back(recipe3);
+
+					Course course(recipeList, 0, 0);
+					totalScore.push_back(course);
+				}
             }
         }
     }
-    //만들 수 있는 3가지 조합들 중 가장 높은 expiration score + satisfy score를 가지는 조합의 total_score 내에서의 index를 highest_index
-    // 2번째 높은 조합의 index를 second_highest_index, 3번째 높은 조합의 index를 third_highest_index
 
-    sort(total_score.begin(), total_score.end(), compareExpScore);
-    double e_norm = get<4>(total_score.back());
-    sort(total_score.begin(), total_score.end(), compareSatScore);
-    double s_norm = get<3>(total_score.back());
+	vector<int> deleteIdx;
 
-    sort(total_score.begin(), total_score.end(), compareScore);
+    for (int i = 0; i < totalScore.size(); i++) {
+		map<string, double> ingredientList;
+		vector<RecipeInfo> recipeList = get<0>(totalScore[i]);
+
+		// check whether the recipe is valid
+		for (int j = 0; j < recipeList.size(); j++) {
+			for (int k = 0; k < recipes[recipeList[j].second].getIngredients().size(); k++) {
+				string ingredientName = recipes[recipeList[j].second].getIngredients()[k].first;
+				int ingredientCount = recipes[recipeList[j].second].getIngredients()[k].second;
+
+				if (ingredientList.find(ingredientName) == ingredientList.end()) ingredientList.insert(pair<string, int>(ingredientName, ingredientCount));
+				else ingredientList[ingredientName] += ingredientCount;
+			}
+		}
+
+		for (auto elem : ingredientList) {
+			if (foodList.find(elem.first) == foodList.end()) { deleteIdx.push_back(i); break; }
+			if (foodList[elem.first].size() < elem.second) { deleteIdx.push_back(i); break; }
+		}
+
+		ingredients.push_back(ingredientList);
+    }
+
+	for (int i = 0; i < deleteIdx.size(); i++) { // remove courses with insufficient ingredients
+		totalScore.erase(totalScore.begin() + deleteIdx[i] - i);
+		ingredients.erase(ingredients.begin() + deleteIdx[i] - i);
+	}
+
+    vector<string> namesVisited;
+
+	for (int i = 0; i < totalScore.size(); i++) {
+		double satisfaction(0.0), expiration(0.0);
+
+		for (map<string,double>::iterator iter = ingredients[i].begin(); iter != ingredients[i].end(); ++iter) {
+			string name = iter->first;
+            namesVisited.push_back(name);
+
+			vector<FoodPtr> v = foodList[name];
+			sort(v.begin(), v.end(), controller->compareExp);
+            
+			for (int j = 0; j < iter->second; j++)
+				v.pop_back();
+
+            for (auto elem : v)
+                expiration += elem->getExp();
+ 		}
+
+        for (map<string, vector<FoodPtr>>::iterator iter = foodList.begin(); iter != foodList.end(); ++iter) {
+            bool contains = false;
+            for (auto name : namesVisited) {
+                if (name == iter->first) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (contains) continue;
+            else
+                for (auto elem : iter->second)
+                    expiration += elem->getExp();
+        }
+        
+		for (auto elem : get<0>(totalScore[i])) {
+			satisfaction += recipes[elem.second].getScore();
+		}
+
+		get<1>(totalScore[i]) = satisfaction;
+		get<2>(totalScore[i]) = expiration;
+	}
+
+    sort(totalScore.begin(), totalScore.end(), compareExpScore);
+    double e_norm = get<2>(totalScore.back());
+    sort(totalScore.begin(), totalScore.end(), compareSatScore);
+    double s_norm = get<1>(totalScore.back());
+
+    for (int i = 0; i < totalScore.size(); i++) {
+        get<1>(totalScore[i]) /= s_norm;
+        get<2>(totalScore[i]) /= e_norm;
+    }
+
+    sort(totalScore.begin(), totalScore.end(), compareScore);
+
+    for (auto elem : totalScore) {
+        cout << get<0>(elem)[0].first << ", " << get<0>(elem)[1].first <<
+            ", " << get<0>(elem)[2].first << ": " << get<1>(elem) << ", " << get<2>(elem) << " = " << get<1>(elem) + get<2>(elem) << endl;
+    }
 
     int count(0);
-    while (total_score.size() != 0 && count < 3)
-    {
+    while (totalScore.size() != 0 && count < 3) {
         count++;
-        cout << "1. " << get<0>(total_score.back()) << "  2. " << get<1>(total_score.back()) << "  3. " << get<2>(total_score.back()) << "  /  total score sum : ";
-        cout << get<3>(total_score.back()) / s_norm + get<4>(total_score.back()) / e_norm << "  (" << get<3>(total_score.back()) / s_norm << " / " << get<4>(total_score.back()) / e_norm << ")" << endl;
-        total_score.pop_back();
+        cout << "1. " << get<0>(totalScore.back())[0].first << "  2. " << get<0>(totalScore.back())[1].first << "  3. " << get<0>(totalScore.back())[2].first << "  /  total score sum : ";
+        cout << get<1>(totalScore.back()) + get<2>(totalScore.back()) << "  (" << get<1>(totalScore.back()) << " / " << get<2>(totalScore.back()) << ")" << endl;
+        totalScore.pop_back();
     }
 }
 

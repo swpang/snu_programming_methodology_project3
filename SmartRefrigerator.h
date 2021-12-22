@@ -9,6 +9,9 @@
 
 typedef vector<Recipe> recipeVec;
 
+typedef pair<string, double> RecipeInfo;
+typedef tuple<vector<RecipeInfo>, double, double> Course;
+
 class SmartRefrigerator : public Refrigerator {
 public:
     SmartRefrigerator();
@@ -16,9 +19,9 @@ public:
     void showRecipe();
     void recommendMealCourses();
     int menuSelect();
-    static bool compareScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2);
-    static bool compareExpScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2);
-    static bool compareSatScore(const tuple<string, string, string, int, int> t1, const tuple<string, string, string, int, int> t2);
+    static bool compareScore(const tuple<vector<RecipeInfo>, double, double> t1, tuple<vector<RecipeInfo>, double, double> t2);
+    static bool compareExpScore(const tuple<vector<RecipeInfo>, double, double> t1, tuple<vector<RecipeInfo>, double, double> t2);
+    static bool compareSatScore(const tuple<vector<RecipeInfo>, double, double> t1, tuple<vector<RecipeInfo>, double, double> t2);
 
 private:
     recipeVec recipes;

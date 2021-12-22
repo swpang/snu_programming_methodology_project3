@@ -24,13 +24,15 @@ public:
     virtual bool popFood(const string) = 0;
     virtual bool stackFood(const string, intPair, int) = 0;
 
+    static bool comparePos(const FoodPtr food1, const FoodPtr food2);
+    static bool compareExp(const FoodPtr food1, const FoodPtr food2);
+
 protected:
     intPair size;
     vector<Shelf> shelves;
     foodListType &foodList;
 
     vector<FoodPtr>::iterator findMinExpFood(const string);
-    static bool comparePos(const FoodPtr food1, const FoodPtr food2);
     
 private:
     bool **storageGrid;

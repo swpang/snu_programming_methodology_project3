@@ -48,6 +48,13 @@ bool Controller::comparePos(const FoodPtr food1, const FoodPtr food2)
     else return false;
 }
 
+bool Controller::compareExp(const FoodPtr food1, const FoodPtr food2) 
+{
+    if (food1->getExp() > food2->getExp())
+        return true;
+    else return false;
+}
+
 /**
  * Set element of storageGrid in the given range to true
  *
