@@ -188,21 +188,21 @@ void SmartRefrigerator::recommendMealCourses()
                     {
                         if (iter1->getIngredients()[j].first == course_require[i].first)
                         {
-                            course_require[i].second = iter1->getIngredients()[j].second;
+                            course_require[i].second =  course_require[i].second + iter1->getIngredients()[j].second;
                         }
                     }
                     for (int j = 0; j < iter2->getIngredients().size(); j++)
                     {
                         if (iter2->getIngredients()[j].first == course_require[i].first)
                         {
-                            course_require[i].second = iter2->getIngredients()[j].second;
+                            course_require[i].second =  course_require[i].second + iter2->getIngredients()[j].second;
                         }
                     }
                     for (int j = 0; j < iter3->getIngredients().size(); j++)
                     {
                         if (iter3->getIngredients()[j].first == course_require[i].first)
                         {
-                            course_require[i].second = iter3->getIngredients()[j].second;
+                            course_require[i].second =  course_require[i].second + iter3->getIngredients()[j].second;
                         }
                     }
                 }
