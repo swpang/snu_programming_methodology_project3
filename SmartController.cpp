@@ -42,10 +42,10 @@ bool SmartController::stackFood(const string name, intPair foodSize, int exp)
     bool placed = false;
     int x, y;
 
-    if (shelves.size() == 0)
+    if (shelves.size() == 0) // if no shelves, place the first shelf
         shelves.push_back(Shelf(0));
     
-    if (foodList.find(name) == foodList.end())
+    if (foodList.find(name) == foodList.end()) // 
         foodList.insert(pair<string, vector<FoodPtr>>(name, { }));
 
     if (foodSize.first > size.first) // 음식이 냉장고보다 큰 경우
@@ -84,8 +84,7 @@ bool SmartController::stackFood(const string name, intPair foodSize, int exp)
     }
 
     // 새로운 shelf를 추가해야한 경우 (모든 shelf를 다 돌았는데 배치를 못받은 경우에 대해)
-    if (shelves.back().height + maxHeight(shelves.back()) > size.second)
-        return false;
+    if (shelves.back().height + maxHeight(shelves.back()) > size.second) return false;
     
     shelves.push_back(Shelf(shelves.back().height + maxHeight(shelves.back())));
     x = 0;
@@ -97,7 +96,6 @@ bool SmartController::stackFood(const string name, intPair foodSize, int exp)
 
     cout << "Inserting " << name << " into x: 0, y: " << shelves.back().height << endl;
     return true;
-    return false;
 }
 
 /**
@@ -117,6 +115,8 @@ bool SmartController::popFood(const string food_name) // void
     int foodSize(0);
     int deltaY(0);
     vector<FoodPtr> temp = {};
+
+    if (foodList.find(food_name) == foodList.end()) return false;
 
     min = *findMinExpFood(food_name);
     vector<FoodPtr> &v = foodList[food_name];
