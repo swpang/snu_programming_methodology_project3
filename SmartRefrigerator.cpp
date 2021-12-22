@@ -19,6 +19,9 @@ SmartRefrigerator::SmartRefrigerator()
     controller = new SmartController(size, foodList);
 };
 
+/**
+ * @brief A comparator function that compares based on the summed (expiration + satisfaction) score
+ */
 bool SmartRefrigerator::compareScore(const tuple<vector<RecipeInfo>, double, double> t1, const tuple<vector<RecipeInfo>, double, double> t2)
 {
     double score1 = get<1>(t1) + get<2>(t1);
@@ -30,6 +33,9 @@ bool SmartRefrigerator::compareScore(const tuple<vector<RecipeInfo>, double, dou
         return false;
 }
 
+/**
+ * @brief A comparator function that compares based on the expiration score
+ */
 bool SmartRefrigerator::compareExpScore(const tuple<vector<RecipeInfo>, double, double> t1, const tuple<vector<RecipeInfo>, double, double> t2)
 {
     double score1 = get<2>(t1);
@@ -41,6 +47,9 @@ bool SmartRefrigerator::compareExpScore(const tuple<vector<RecipeInfo>, double, 
         return false;
 }
 
+/**
+ * @brief A comparator function that compares based on the satisfaction score
+ */
 bool SmartRefrigerator::compareSatScore(const tuple<vector<RecipeInfo>, double, double> t1, const tuple<vector<RecipeInfo>, double, double> t2)
 {
     double score1 = get<1>(t1);
@@ -261,11 +270,6 @@ void SmartRefrigerator::recommendMealCourses()
     double e_norm = get<2>(totalScore.back());
     sort(totalScore.begin(), totalScore.end(), compareSatScore);
     double s_norm = get<1>(totalScore.back());
-
-    for (auto elem : totalScore) {
-        cout << get<0>(elem)[0].first << ", " << get<0>(elem)[1].first <<
-            ", " << get<0>(elem)[2].first << ": " << get<1>(elem) << ", " << get<2>(elem) << " = " << get<1>(elem) + get<2>(elem) << endl;
-    }
 
     for (int i = 0; i < totalScore.size(); i++) {
         get<1>(totalScore[i]) /= s_norm;
