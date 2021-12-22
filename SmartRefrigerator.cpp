@@ -215,29 +215,30 @@ void SmartRefrigerator::recommendMealCourses()
 		ingredients.erase(ingredients.begin() + deleteIdx[i] - i);
 	}
 
-    vector<string> namesVisited;
+    /////////////////////////////////////////////////////////////////////////////////////여기까진 일단 문제없음
 
-	for (int i = 0; i < totalScore.size(); i++) {
-		double satisfaction(0.0), expiration(0.0);
+    for (int i = 0; i < totalScore.size(); i++) { // 만든 모든 조합에 대해 loop를 돌거야
+		vector<string> namesVisited;
+        double satisfaction(0.0), expiration(0.0);
 
-		for (map<string,double>::iterator iter = ingredients[i].begin(); iter != ingredients[i].end(); ++iter) {
-			string name = iter->first;
-            namesVisited.push_back(name);
+		for (map<string,double>::iterator iter = ingredients[i].begin(); iter != ingredients[i].end(); ++iter) { // 하나의 조합에 대해서 모든 필요한 재료에 대해 loop
+			string name = iter->first; // 재료의 이름 e.g. egg
+            namesVisited.push_back(name); // 코스에 사용된 재료들은 여기에 저장
 
-			vector<FoodPtr> v = foodList[name];
-			sort(v.begin(), v.end(), controller->compareExp);
+			vector<FoodPtr> v = foodList[name]; // foodList에서 해당 재료에 대한 정보를 가져옴 (복사해서 가져옴)
+			sort(v.begin(), v.end(), controller->compareExp); // expire date를 기준으로 정렬 (작은게 뒷쪽으로 가게끔)
             
-			for (int j = 0; j < iter->second; j++)
+			for (int j = 0; j < iter->second; j++) // 해당 재료의 개수만큼 foodList의 재료의 뒷쪽 (expire date 작은 쪽) 에서 pop
 				v.pop_back();
 
-            for (auto elem : v)
+            for (auto elem : v) // pop되고 남은 재료들에 대해서 expiration date 누적 계산
                 expiration += elem->getExp();
  		}
 
-        for (map<string, vector<FoodPtr>>::iterator iter = foodList.begin(); iter != foodList.end(); ++iter) {
+        for (map<string, vector<FoodPtr>>::iterator iter = foodList.begin(); iter != foodList.end(); ++iter) { // foodList 그 자체에 대해서 각 재료별로 loop
             bool contains = false;
-            for (auto name : namesVisited) {
-                if (name == iter->first) {
+            for (auto name : namesVisited) { // 코스에 사용되었던 재료들이 저장된 곳을 loop
+                if (name == iter->first) { // 만약 돌다가 코스에 사용되었던 재료랑 foodlist 의 재료가 똑같으면 계산을 해줄 필요가 없으므로 loop를 빠져나온다
                     contains = true;
                     break;
                 }
@@ -245,7 +246,7 @@ void SmartRefrigerator::recommendMealCourses()
             if (contains) continue;
             else
                 for (auto elem : iter->second)
-                    expiration += elem->getExp();
+                    expiration += elem->getExp(); // 한번도 사용하지 않은 재료들은 FoodPtr 벡터에 대해 돌면서 각 재료의 expiration date를 누적 계산한다
         }
         
 		for (auto elem : get<0>(totalScore[i])) {
