@@ -151,8 +151,6 @@ bool SmartController::popFood(const string food_name) // void
                 && temp.back()->getName() == shelves[i].vec[j]->getName()
                 && !erased) {
                 shelves[i].vec.erase(shelves[i].vec.begin() + j);
-                if (shelves[i].vec.size() == 0)
-                    shelves.erase(shelves.begin() + i);
                 erased = true;
                 // shelf 재정렬 관련 모든게 다 여기에 들어가야함!
                 if (shelves[i].height != shelves.back().height) { // 가장 위 shelf가 아닌 경우
@@ -167,7 +165,7 @@ bool SmartController::popFood(const string food_name) // void
                 int y = shelves[i].height;
                 intPair newPos(newX, y);
 
-                vector<FoodPtr> &temp = foodList[shelves[i].vec[i - 1]->getName()];
+                vector<FoodPtr> &temp = foodList[shelves[i].vec[j - 1]->getName()];
                 for (int k = 0; k < temp.size(); k++) {
                     if (temp[k]->getExp() == shelves[i].vec[j - 1]->getExp() && temp[k]->getPos() == shelves[i].vec[j - 1]->getPos()) {
                         temp[k]->setPos(newPos);
@@ -181,7 +179,7 @@ bool SmartController::popFood(const string food_name) // void
                 int newY = shelves[i].height;
                 intPair newPos(x, newY);
 
-                vector<FoodPtr> &temp = foodList[shelves[i].vec[i]->getName()];
+                vector<FoodPtr> &temp = foodList[shelves[i].vec[j]->getName()];
                 for (int k = 0; k < temp.size(); k++) {
                     if (temp[k]->getExp() == shelves[i].vec[j]->getExp() && temp[k]->getPos() == shelves[i].vec[j]->getPos()) {
                         temp[k]->setPos(newPos);
